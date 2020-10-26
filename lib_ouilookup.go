@@ -282,3 +282,90 @@ func loadDatabase(fileName string) (db ouiDatabase, err error) {
 	devMessage("Leaving loadDatabase()")
 	return
 }
+
+/*
+#### ##    ## ########  ##     ## ########    ##     ##    ###    ##    ## ########  ##       #### ##    ##  ######
+ ##  ###   ## ##     ## ##     ##    ##       ##     ##   ## ##   ###   ## ##     ## ##        ##  ###   ## ##    ##
+ ##  ####  ## ##     ## ##     ##    ##       ##     ##  ##   ##  ####  ## ##     ## ##        ##  ####  ## ##
+ ##  ## ## ## ########  ##     ##    ##       ######### ##     ## ## ## ## ##     ## ##        ##  ## ## ## ##   ####
+ ##  ##  #### ##        ##     ##    ##       ##     ## ######### ##  #### ##     ## ##        ##  ##  #### ##    ##
+ ##  ##   ### ##        ##     ##    ##       ##     ## ##     ## ##   ### ##     ## ##        ##  ##   ### ##    ##
+#### ##    ## ##         #######     ##       ##     ## ##     ## ##    ## ########  ######## #### ##    ##  ######
+*/
+
+func filterHexChars(r rune) rune {
+	devMessage("Entering filterHexChars()")
+
+	switch {
+	case r >= '0' && r <= '9':
+		return r
+	case r >= 'A' && r <= 'F':
+		return r
+	case r >= 'a' && r <= 'f':
+		return r
+	}
+
+	devMessage("Leaving filterHexChars()")
+	return -1
+}
+
+func isValidMAC(mac string) bool {
+	var reFullMAC = regexp.MustCompile(`^([0-9A-Fa-f]{2}[-:]?){5}[0-9A-Fa-f]{2}$`)
+	var reOUIOnly = regexp.MustCompile(`^([0-9A-Fa-f]{2}[-:]?){2}[0-9A-Fa-f]{2}$`)
+
+	devMessage("Entering isValidMAC()")
+
+	if reFullMAC.Match([]byte(mac)) {
+		return true
+	}
+	if reOUIOnly.Match([]byte(mac)) {
+		return true
+	}
+
+	devMessage("Leaving isValidMAC()")
+	return false
+}
+
+func extractOUI(mac string) (oui string, err error) {
+	devMessage("Entering extractOUI()")
+
+	hexOnly := strings.Map(filterHexChars, mac)
+
+	if len(hexOnly) < 6 {
+		err = fmt.Errorf("Not enough characters to extract an OUI")
+		return
+	}
+	oui = hexOnly[:6]
+
+	devMessage("Leaving extractOUI()")
+	return
+}
+
+func normalizeMAC(mac string) (normalizedMAC string, err error) {
+	var normalized []rune
+	var charCount uint
+
+	devMessage("Entering normalizeMAC()")
+
+	mac = strings.Map(filterHexChars, mac)
+	if len(mac) > 12 {
+		err = fmt.Errorf("MAC too long")
+		return
+	}
+	for len(mac) < 12 {
+		mac = mac + "0"
+	}
+
+	charCount = 0
+	for _, c := range mac {
+		charCount++
+		normalized = append(normalized, c)
+		if charCount%2 == 0 {
+			normalized = append(normalized, ':')
+		}
+	}
+	normalizedMAC = strings.Trim(string(normalized), ":")
+
+	devMessage("Leaving normalizeMAC()")
+	return
+}

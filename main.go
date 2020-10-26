@@ -189,11 +189,13 @@ func main() {
 		Long:  `Some longer description for lookup here.`,
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			lookupMain()
+			lookupMain(args)
 		},
 	}
-	cmdLookup.Flags().BoolVarP(&config.Lookup.FetchOnlineDatabase, "dbfetch", "f", envordef.BoolVal("OUILOOKUP_FETCHDB", true), "Fetch online database if offline not accessible")
-	cmdLookup.Flags().BoolVarP(&config.Lookup.OutputJSON, "json", "j", envordef.BoolVal("OUILOOKUP_JSON", false), "Output in JSON format")
+	/*
+		cmdLookup.Flags().BoolVarP(&config.Lookup.FetchOnlineDatabase, "dbfetch", "f", envordef.BoolVal("OUILOOKUP_FETCHDB", true), "Fetch online database if offline not accessible")
+		cmdLookup.Flags().BoolVarP(&config.Lookup.OutputJSON, "json", "j", envordef.BoolVal("OUILOOKUP_JSON", false), "Output in JSON format")
+	*/
 
 	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdLookup)
 	rootCmd.Execute()
