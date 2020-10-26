@@ -53,8 +53,8 @@ type appConfig struct {
 */
 
 const (
-	// True will reveal informal messages for development purposes
-	devMode bool = true
+	// If this file exists, devMode is set to true
+	devModeFile string = ".devMode"
 
 	// General constants
 	toolName    string = "OUI Lookup"
@@ -85,8 +85,9 @@ const (
 */
 
 var (
-	config appConfig
-	stdErr = log.New(os.Stderr, "", 0)
+	config  appConfig
+	devMode bool = false
+	stdErr       = log.New(os.Stderr, "", 0)
 )
 
 /*
@@ -110,6 +111,25 @@ func sanitizeArguments() {
 		config.Update.HTTPTimeoutSeconds = 5
 	} else if config.Update.HTTPTimeoutSeconds > 300 {
 		config.Update.HTTPTimeoutSeconds = 300
+	}
+}
+
+/*
+#### ##    ## #### ########
+ ##  ###   ##  ##     ##
+ ##  ####  ##  ##     ##
+ ##  ## ## ##  ##     ##
+ ##  ##  ####  ##     ##
+ ##  ##   ###  ##     ##
+#### ##    ## ####    ##
+*/
+
+func init() {
+	info, err := os.Stat(devModeFile)
+	if err == nil {
+		if !info.IsDir() {
+			devMode = true
+		}
 	}
 }
 
