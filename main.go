@@ -32,13 +32,16 @@ import (
 
 type appConfig struct {
 	DatabaseFile string
-	Lookup       struct {
-		FetchOnlineDatabase bool
-		OutputJSON          bool
-	}
-	Update struct {
+	Update       struct {
 		DatabaseURL        string
 		HTTPTimeoutSeconds uint
+	}
+	Export struct {
+		OutputFormat string
+	}
+	Lookup struct {
+		FetchOnlineDatabase bool
+		OutputJSON          bool
 	}
 }
 
@@ -68,6 +71,9 @@ const (
 	errDatabaseFetch    int = 10
 	errDatabaseCompress int = 11
 	errDatabaseStore    int = 12
+	errDatabaseLoad     int = 15
+	errDatabaseParse    int = 16
+	errExportFormat     int = 20
 
 	// Hardcoded defaults as fallbacks
 	ouiDatabaseFile string = "oui.txt.gz"
@@ -156,6 +162,29 @@ func main() {
 	rootCmd.SetVersionTemplate(fmt.Sprintf("%s\n", toolID))
 	rootCmd.PersistentFlags().StringVarP(&config.DatabaseFile, "dbfile", "d", envordef.StringVal("OUILOOKUP_DBFILE", ouiDatabaseFile), "Local database file to use")
 
+	var cmdUpdate = &cobra.Command{
+		Use:   "update",
+		Short: "Update local OUI database",
+		Long:  `Some longer description for update here.`,
+		Args:  cobra.MinimumNArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			updateMain()
+		},
+	}
+	cmdUpdate.Flags().StringVarP(&config.Update.DatabaseURL, "dburl", "u", envordef.StringVal("OUILOOKUP_DBURL", ouiDatabaseURL), "URL to fetch the database from")
+	cmdUpdate.Flags().UintVarP(&config.Update.HTTPTimeoutSeconds, "httptimeout", "t", envordef.UintVal("OUILOOKUP_HTTPTIMEOUT", 60), "HTTP timeout in seconds")
+
+	var cmdExport = &cobra.Command{
+		Use:   "export",
+		Short: "Export OUI database",
+		Long:  `Some longer description for export here.`,
+		Args:  cobra.MinimumNArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			exportMain()
+		},
+	}
+	cmdExport.Flags().StringVar(&config.Export.OutputFormat, "format", envordef.StringVal("OUILOOKUP_EXPORTFORMAT", "csv"), "Output format for export")
+
 	var cmdLookup = &cobra.Command{
 		Use:   "lookup [stuff]",
 		Short: "Look up MAC vendor",
@@ -168,19 +197,7 @@ func main() {
 	cmdLookup.Flags().BoolVarP(&config.Lookup.FetchOnlineDatabase, "dbfetch", "f", envordef.BoolVal("OUILOOKUP_FETCHDB", true), "Fetch online database if offline not accessible")
 	cmdLookup.Flags().BoolVarP(&config.Lookup.OutputJSON, "json", "j", envordef.BoolVal("OUILOOKUP_JSON", false), "Output in JSON format")
 
-	var cmdUpdate = &cobra.Command{
-		Use:   "update",
-		Short: "Update OUI database",
-		Long:  `Some longer description for update here.`,
-		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			updateMain()
-		},
-	}
-	cmdUpdate.Flags().StringVarP(&config.Update.DatabaseURL, "dburl", "u", envordef.StringVal("OUILOOKUP_DBURL", ouiDatabaseURL), "URL to fetch the database from")
-	cmdUpdate.Flags().UintVarP(&config.Update.HTTPTimeoutSeconds, "httptimeout", "t", envordef.UintVal("OUILOOKUP_HTTPTIMEOUT", 60), "HTTP timeout in seconds")
-
-	rootCmd.AddCommand(cmdLookup, cmdUpdate)
+	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdLookup)
 	rootCmd.Execute()
 
 	devMessage(fmt.Sprintf("Exiting at %v", time.Now()))
