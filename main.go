@@ -99,6 +99,16 @@ var (
 ##       ##     ## ##   ### ##    ## ##    ##
 ##        #######  ##    ##  ######   ######
 */
+
+func setDevMode() {
+	info, err := os.Stat(devModeFile)
+	if err == nil {
+		if !info.IsDir() {
+			devMode = true
+		}
+	}
+}
+
 func devMessage(message string) {
 	if devMode {
 		stdErr.Printf("DEV: %s\n", message)
@@ -125,12 +135,7 @@ func sanitizeArguments() {
 */
 
 func init() {
-	info, err := os.Stat(devModeFile)
-	if err == nil {
-		if !info.IsDir() {
-			devMode = true
-		}
-	}
+	setDevMode()
 }
 
 /*
