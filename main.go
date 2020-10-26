@@ -66,14 +66,12 @@ const (
 	toolURL     string = "https://gitlab.com/rbrt-weiler/ouilookup"
 
 	// Error codes
-	errSuccess          int = 0
-	errMissingArgs      int = 1
-	errDatabaseFetch    int = 10
-	errDatabaseCompress int = 11
-	errDatabaseStore    int = 12
-	errDatabaseLoad     int = 15
-	errDatabaseParse    int = 16
-	errExportFormat     int = 20
+	errSuccess        int = 0
+	errMissingArgs    int = 1
+	errDatabaseUpdate int = 10
+	errDatabaseLoad   int = 15
+	errDatabaseParse  int = 16
+	errExportFormat   int = 20
 
 	// Hardcoded defaults as fallbacks
 	ouiDatabaseFile string = "oui.txt.gz"

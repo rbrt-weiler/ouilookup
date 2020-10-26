@@ -11,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	resty "github.com/go-resty/resty/v2"
 )
 
 /*
@@ -74,6 +76,46 @@ func (db *ouiDatabase) ToJSON() string {
 ##        ##  ##       ##          ##     ## ##     ## ##   ### ##     ## ##        ##  ##   ### ##    ##
 ##       #### ######## ########    ##     ## ##     ## ##    ## ########  ######## #### ##    ##  ######
 */
+
+func fetchOnlineDatabase(url string) (bytes.Buffer, error) {
+	var buf bytes.Buffer
+
+	devMessage("Entering fetchOnlineDatabase()")
+
+	client := resty.New()
+	client.SetTimeout(time.Duration(config.Update.HTTPTimeoutSeconds) * time.Second)
+	resp, respErr := client.R().Get(url)
+	if respErr != nil {
+		return buf, respErr
+	}
+	devMessage(fmt.Sprintf("Status Code   : %v", resp.StatusCode()))
+	devMessage(fmt.Sprintf("Response Size : %v", resp.Size()))
+
+	devMessage("Leaving fetchOnlineDatabase()")
+	return *bytes.NewBuffer(resp.Body()), nil
+}
+
+func storeOnlineDatabase(url string, fileName string) error {
+	devMessage("Entering storeOnlineDatabase()")
+
+	onlineDatabase, onlineDatabaseErr := fetchOnlineDatabase(url)
+	if onlineDatabaseErr != nil {
+		return fmt.Errorf("Error fetching online OUI database: %s", onlineDatabaseErr)
+	}
+
+	compressedData, compressedDataErr := compressData(onlineDatabase)
+	if compressedDataErr != nil {
+		return fmt.Errorf("Error compressing OUI database: %s", compressedDataErr)
+	}
+
+	storeErr := storeData(fileName, compressedData)
+	if storeErr != nil {
+		return fmt.Errorf("Error storing local OUI database: %s", storeErr)
+	}
+
+	devMessage("Leaving storeOnlineDatabase()")
+	return nil
+}
 
 func storeData(fileName string, content bytes.Buffer) error {
 	devMessage("Entering storeData()")
