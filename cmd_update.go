@@ -30,6 +30,8 @@ func updateMain() {
 		stdErr.Printf("Error storing local OUI database: %\n", storeErr)
 		os.Exit(errDatabaseStore)
 	}
+
+	devMessage("Leaving updateMain()")
 }
 
 func fetchOnlineDatabase() (bytes.Buffer, error) {
@@ -46,5 +48,6 @@ func fetchOnlineDatabase() (bytes.Buffer, error) {
 	devMessage(fmt.Sprintf("Status Code   : %v", resp.StatusCode()))
 	devMessage(fmt.Sprintf("Response Size : %v", resp.Size()))
 
+	devMessage("Leaving fetchOnlineDatabase()")
 	return *bytes.NewBuffer(resp.Body()), nil
 }

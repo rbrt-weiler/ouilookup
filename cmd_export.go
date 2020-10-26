@@ -30,4 +30,6 @@ func exportMain() {
 	}
 
 	fmt.Println(output)
+
+	devMessage("Leaving exportMain()")
 }

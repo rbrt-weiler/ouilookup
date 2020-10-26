@@ -117,7 +117,7 @@ func setDevMode() {
 
 func devMessage(message string) {
 	if devMode {
-		stdErr.Printf("DEV: %s\n", message)
+		stdErr.Printf("DEV %v: %s\n", time.Now(), message)
 	}
 }
 
@@ -155,7 +155,7 @@ func init() {
 */
 
 func main() {
-	devMessage(fmt.Sprintf("Started at %v", time.Now()))
+	devMessage("Entering main()")
 
 	var rootCmd = &cobra.Command{Use: "ouilookup"}
 	rootCmd.Version = toolVersion
@@ -200,6 +200,6 @@ func main() {
 	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdLookup)
 	rootCmd.Execute()
 
-	devMessage(fmt.Sprintf("Exiting at %v", time.Now()))
+	devMessage("Leaving main()")
 	os.Exit(errSuccess)
 }

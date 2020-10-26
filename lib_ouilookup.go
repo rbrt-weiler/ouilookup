@@ -35,25 +35,33 @@ type ouiDatabase struct {
 func (db *ouiDatabase) ToText() string {
 	var lines []string
 
+	devMessage("Entering ouiDatabase.ToText()")
+
 	for oui, data := range db.OUIDatabase {
 		lines = append(lines, fmt.Sprintf("%s\t%s", oui, data.VendorName))
 	}
 
+	devMessage("Leaving ouiDatabase.ToText()")
 	return strings.Join(lines, "\n")
 }
 
 func (db *ouiDatabase) ToCSV() string {
 	var lines []string
 
+	devMessage("Entering ouiDatabase.ToCSV()")
+
 	for oui, data := range db.OUIDatabase {
 		lines = append(lines, fmt.Sprintf(`"%s","%s"`, oui, data.VendorName))
 	}
 
+	devMessage("Leaving ouiDatabase.ToCSV()")
 	return strings.Join(lines, "\n")
 }
 
 func (db *ouiDatabase) ToJSON() string {
+	devMessage("Entering ouiDatabase.ToJSON()")
 	json, _ := json.MarshalIndent(db, "", "    ")
+	devMessage("Leaving ouiDatabase.ToJSON()")
 	return string(json)
 }
 
@@ -87,6 +95,7 @@ func storeData(fileName string, content bytes.Buffer) error {
 		return fmt.Errorf("Could not flush file buffer: %s", flushErr)
 	}
 
+	devMessage("Leaving storeData()")
 	return nil
 }
 
@@ -101,6 +110,7 @@ func loadData(fileName string) (bytes.Buffer, error) {
 	}
 	retVal = *bytes.NewBuffer(content)
 
+	devMessage("Leaving loadData()")
 	return retVal, nil
 }
 
@@ -119,6 +129,7 @@ func decompressData(content bytes.Buffer) (bytes.Buffer, error) {
 		return buf, fmt.Errorf("Could not read compressed data: %s", bufErr)
 	}
 
+	devMessage("Leaving decompressData()")
 	return buf, nil
 }
 
@@ -146,6 +157,7 @@ func compressData(content bytes.Buffer) (bytes.Buffer, error) {
 		return buf, fmt.Errorf("Could not close gzip stream: %s", closeErr)
 	}
 
+	devMessage("Leaving compressData()")
 	return buf, nil
 }
 
@@ -172,6 +184,7 @@ func loadRawDatabase(fileName string) (db bytes.Buffer, err error) {
 		return db, fmt.Errorf("Could not decompress database: %s", err)
 	}
 
+	devMessage("Leaving loadRawDatabase()")
 	return
 }
 
@@ -208,10 +221,13 @@ func parseRawDatabase(content bytes.Buffer) (ouiDB ouiDatabase, err error) {
 		}
 	}
 
+	devMessage("Leaving parseRawDatabase()")
 	return
 }
 
 func loadDatabase(fileName string) (db ouiDatabase, err error) {
+	devMessage("Entering loadDatabase()")
+
 	rawDB, rawDBErr := loadRawDatabase(config.DatabaseFile)
 	if rawDBErr != nil {
 		return db, fmt.Errorf("Error reading local OUI database: %s", rawDBErr)
@@ -220,5 +236,7 @@ func loadDatabase(fileName string) (db ouiDatabase, err error) {
 	if err != nil {
 		return db, fmt.Errorf("Error parsing local OUI database: %s", err)
 	}
+
+	devMessage("Leaving loadDatabase()")
 	return
 }

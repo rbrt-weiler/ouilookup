@@ -1,5 +1,6 @@
 package main
 
 func lookupMain() {
-	devMessage("in lookupMain")
+	devMessage("Entering lookupMain()")
+	devMessage("Leaving lookupMain()")
 }
