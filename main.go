@@ -163,7 +163,7 @@ func main() {
 	var cmdUpdate = &cobra.Command{
 		Use:   "update",
 		Short: "Update local OUI database",
-		Long:  `Some longer description for update here.`,
+		Long:  `Use update to fetch a copy of an online OUI database and save it locally.`,
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			updateMain()
@@ -175,18 +175,19 @@ func main() {
 	var cmdExport = &cobra.Command{
 		Use:   "export",
 		Short: "Export OUI database",
-		Long:  `Some longer description for export here.`,
-		Args:  cobra.MinimumNArgs(0),
+		Long: `Use export to export the locally stored OUI database in various formats.
+Valid output formats are "text", "csv" and "json". Output is written to stdout.`,
+		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			exportMain()
 		},
 	}
-	cmdExport.Flags().StringVar(&config.Export.OutputFormat, "format", envordef.StringVal("OUILOOKUP_EXPORTFORMAT", "csv"), "Output format for export")
+	cmdExport.Flags().StringVarP(&config.Export.OutputFormat, "format", "f", envordef.StringVal("OUILOOKUP_EXPORTFORMAT", "csv"), "Output format for export")
 
 	var cmdLookup = &cobra.Command{
-		Use:   "lookup [stuff]",
+		Use:   "lookup [mac...]",
 		Short: "Look up MAC vendor",
-		Long:  `Some longer description for lookup here.`,
+		Long:  `Use lookup to retrieve the vendor name of any number of given MAC addresses.`,
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			lookupMain(args)
