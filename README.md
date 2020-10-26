@@ -1,6 +1,6 @@
 # OUI Lookup
 
-OUI Lookup is used to locally store and query a Organizational Unit Identifier (OUI) database. Its intended audience are network administrators that do not want to rely on an always on Internet connectivity for retrieving this kind of information.
+OUI Lookup is used to locally store and query an Organizational Unit Identifier (OUI) database. Its intended audience are network administrators that do not want to rely on an always on Internet connectivity for retrieving this kind of information.
 
 This tool has to be considered as **WORK IN PROGRESS** for now.
 
