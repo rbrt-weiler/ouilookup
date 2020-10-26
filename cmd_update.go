@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"time"
@@ -24,24 +25,26 @@ func updateMain() {
 		os.Exit(errDatabaseCompress)
 	}
 
-	storeErr := storeData(config.DatabaseFile, compressedData.String())
+	storeErr := storeData(config.DatabaseFile, compressedData)
 	if storeErr != nil {
 		stdErr.Printf("Error storing local OUI database: %\n", storeErr)
 		os.Exit(errDatabaseStore)
 	}
 }
 
-func fetchOnlineDatabase() (string, error) {
+func fetchOnlineDatabase() (bytes.Buffer, error) {
+	var buf bytes.Buffer
+
 	devMessage("Entering fetchOnlineDatabase()")
 
 	client := resty.New()
 	client.SetTimeout(time.Duration(config.Update.HTTPTimeoutSeconds) * time.Second)
 	resp, respErr := client.R().Get(config.Update.DatabaseURL)
 	if respErr != nil {
-		return "", respErr
+		return buf, respErr
 	}
 	devMessage(fmt.Sprintf("Status Code   : %v", resp.StatusCode()))
 	devMessage(fmt.Sprintf("Response Size : %v", resp.Size()))
 
-	return resp.String(), nil
+	return *bytes.NewBuffer(resp.Body()), nil
 }
