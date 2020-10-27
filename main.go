@@ -126,6 +126,7 @@ func sanitizeArguments() {
 	} else if config.Update.HTTPTimeoutSeconds > 300 {
 		config.Update.HTTPTimeoutSeconds = 300
 	}
+	devMessage("Leaving sanitizeArguments()")
 }
 
 /*
