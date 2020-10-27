@@ -96,19 +96,25 @@ func fetchOnlineDatabase(url string) (bytes.Buffer, error) {
 }
 
 func storeOnlineDatabase(url string, fileName string) error {
+	var database *bytes.Buffer
+
 	devMessage("Entering storeOnlineDatabase()")
 
 	onlineDatabase, onlineDatabaseErr := fetchOnlineDatabase(url)
 	if onlineDatabaseErr != nil {
 		return fmt.Errorf("Error fetching online OUI database: %s", onlineDatabaseErr)
 	}
+	database = &onlineDatabase
 
-	compressedData, compressedDataErr := compressData(onlineDatabase)
-	if compressedDataErr != nil {
-		return fmt.Errorf("Error compressing OUI database: %s", compressedDataErr)
+	if strings.HasSuffix(fileName, ".gz") {
+		compressedData, compressedDataErr := compressData(onlineDatabase)
+		if compressedDataErr != nil {
+			return fmt.Errorf("Error compressing OUI database: %s", compressedDataErr)
+		}
+		database = &compressedData
 	}
 
-	storeErr := storeData(fileName, compressedData)
+	storeErr := storeData(fileName, *database)
 	if storeErr != nil {
 		return fmt.Errorf("Error storing local OUI database: %s", storeErr)
 	}
@@ -221,9 +227,11 @@ func loadRawDatabase(fileName string) (db bytes.Buffer, err error) {
 		return db, fmt.Errorf("Could not load database: %s", err)
 	}
 
-	db, err = decompressData(db)
-	if err != nil {
-		return db, fmt.Errorf("Could not decompress database: %s", err)
+	if strings.HasSuffix(fileName, ".gz") {
+		db, err = decompressData(db)
+		if err != nil {
+			return db, fmt.Errorf("Could not decompress database: %s", err)
+		}
 	}
 
 	devMessage("Leaving loadRawDatabase()")

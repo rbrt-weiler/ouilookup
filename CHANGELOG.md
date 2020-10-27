@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ### Added
 
 1. This changelog.
+1. Support for uncompressed OUI database.
 
 ## [0.1.0] - 2020-10-26
 
