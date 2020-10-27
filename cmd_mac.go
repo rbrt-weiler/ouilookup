@@ -6,10 +6,10 @@ import (
 	"strings"
 )
 
-func lookupMain(args []string) {
+func macMain(args []string) {
 	var vendorName string
 
-	devMessage("Entering lookupMain()")
+	devMessage("Entering macMain()")
 
 	db, dbErr := loadDatabase(config.DatabaseFile)
 	if dbErr != nil {
@@ -39,5 +39,5 @@ func lookupMain(args []string) {
 		fmt.Printf("%s = %s\n", normalized, vendorName)
 	}
 
-	devMessage("Leaving lookupMain()")
+	devMessage("Leaving macMain()")
 }

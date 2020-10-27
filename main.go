@@ -182,13 +182,13 @@ Valid output formats are "text", "csv" and "json". Output is written to stdout.`
 	}
 	cmdExport.Flags().StringVarP(&config.Export.OutputFormat, "format", "f", envordef.StringVal("OUILOOKUP_EXPORTFORMAT", "csv"), "Output format for export")
 
-	var cmdLookup = &cobra.Command{
-		Use:   "lookup [mac...]",
+	var cmdMAC = &cobra.Command{
+		Use:   "mac [mac...]",
 		Short: "Look up MAC vendor",
-		Long:  `Use lookup to retrieve the vendor name of any number of given MAC addresses.`,
+		Long:  `Use mac to retrieve the vendor name of any number of given MAC addresses.`,
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			lookupMain(args)
+			macMain(args)
 		},
 	}
 
@@ -202,7 +202,7 @@ Valid output formats are "text", "csv" and "json". Output is written to stdout.`
 		},
 	}
 
-	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdLookup, cmdVendor)
+	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdMAC, cmdVendor)
 	rootCmd.Execute()
 
 	devMessage("Leaving main()")
