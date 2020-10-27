@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 1. This changelog.
 1. Support for uncompressed OUI database.
+1. Support for querying all OUIs assigned to a specific vendor.
+
+### Fixed
+
+1. Missing devMessage.
 
 ## [0.1.0] - 2020-10-26
 

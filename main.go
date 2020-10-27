@@ -39,10 +39,6 @@ type appConfig struct {
 	Export struct {
 		OutputFormat string
 	}
-	Lookup struct {
-		FetchOnlineDatabase bool
-		OutputJSON          bool
-	}
 }
 
 /*
@@ -66,12 +62,13 @@ const (
 	toolURL     string = "https://gitlab.com/rbrt-weiler/ouilookup"
 
 	// Error codes
-	errSuccess        int = 0
-	errMissingArgs    int = 1
-	errDatabaseUpdate int = 10
-	errDatabaseLoad   int = 15
-	errDatabaseParse  int = 16
-	errExportFormat   int = 20
+	errSuccess         int = 0
+	errMissingArgs     int = 1
+	errDatabaseUpdate  int = 10
+	errDatabaseLoad    int = 15
+	errDatabaseParse   int = 16
+	errDatabaseConvert int = 17
+	errExportFormat    int = 20
 
 	// Hardcoded defaults as fallbacks
 	ouiDatabaseFile string = "oui.txt.gz"
@@ -194,12 +191,18 @@ Valid output formats are "text", "csv" and "json". Output is written to stdout.`
 			lookupMain(args)
 		},
 	}
-	/*
-		cmdLookup.Flags().BoolVarP(&config.Lookup.FetchOnlineDatabase, "dbfetch", "f", envordef.BoolVal("OUILOOKUP_FETCHDB", true), "Fetch online database if offline not accessible")
-		cmdLookup.Flags().BoolVarP(&config.Lookup.OutputJSON, "json", "j", envordef.BoolVal("OUILOOKUP_JSON", false), "Output in JSON format")
-	*/
 
-	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdLookup)
+	var cmdVendor = &cobra.Command{
+		Use:   "vendor [name...]",
+		Short: "Look up OUIs for a specific vendor",
+		Long:  `Use vendor to retrieve the OUIs assigned to a specific vendor.`,
+		Args:  cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			vendorMain(args)
+		},
+	}
+
+	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdLookup, cmdVendor)
 	rootCmd.Execute()
 
 	devMessage("Leaving main()")

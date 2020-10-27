@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -272,6 +273,21 @@ func parseRawDatabase(content bytes.Buffer) (ouiDB ouiDatabase, err error) {
 	}
 
 	devMessage("Leaving parseRawDatabase()")
+	return
+}
+
+func ouiToVendorDatabase(ouiDB ouiDatabase) (vendorDB map[string][]string, err error) {
+	devMessage("Entering ouiToVendorDatabase()")
+	if vendorDB == nil {
+		vendorDB = make(map[string][]string)
+	}
+	for oui, data := range ouiDB.OUIDatabase {
+		vendorDB[data.VendorName] = append(vendorDB[data.VendorName], oui)
+	}
+	for vendor := range vendorDB {
+		sort.Strings(vendorDB[vendor])
+	}
+	devMessage("Leaving ouiToVendorDatabase()")
 	return
 }
 
