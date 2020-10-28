@@ -57,7 +57,7 @@ const (
 
 	// General constants
 	toolName    string = "OUI Lookup"
-	toolVersion string = "0.1.0"
+	toolVersion string = "0.2.0"
 	toolID      string = toolName + "/" + toolVersion
 	toolURL     string = "https://gitlab.com/rbrt-weiler/ouilookup"
 
