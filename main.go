@@ -39,6 +39,9 @@ type appConfig struct {
 	Export struct {
 		OutputFormat string
 	}
+	Server struct {
+		HTTPPort uint
+	}
 }
 
 /*
@@ -123,6 +126,9 @@ func sanitizeArguments() {
 	} else if config.Update.HTTPTimeoutSeconds > 300 {
 		config.Update.HTTPTimeoutSeconds = 300
 	}
+	if config.Server.HTTPPort < 1024 || config.Server.HTTPPort > 65535 {
+		config.Server.HTTPPort = 8000
+	}
 	devMessage("Leaving sanitizeArguments()")
 }
 
@@ -202,7 +208,19 @@ Valid output formats are "text", "csv" and "json". Output is written to stdout.`
 		},
 	}
 
-	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdMAC, cmdVendor)
+	var cmdServer = &cobra.Command{
+		Use:   "server",
+		Short: "Start a HTTP server to lookup MACs and vendors",
+		Long: `Use server to start a HTTP server. The server provides a RESTful API that
+can be used to lookup MACs and vendors.`,
+		Args: cobra.MinimumNArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			serverMain()
+		},
+	}
+	cmdServer.Flags().UintVar(&config.Server.HTTPPort, "port", envordef.UintVal("OUILOOKUP_HTTP_PORT", 8000), "HTTP port to listen on")
+
+	rootCmd.AddCommand(cmdUpdate, cmdExport, cmdMAC, cmdVendor, cmdServer)
 	rootCmd.Execute()
 
 	devMessage("Leaving main()")
