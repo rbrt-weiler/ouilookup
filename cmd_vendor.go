@@ -7,6 +7,7 @@ import (
 
 func vendorMain(args []string) {
 	devMessage("Entering vendorMain()")
+	sanitizeArguments()
 
 	db, dbErr := loadDatabase(config.DatabaseFile)
 	if dbErr != nil {

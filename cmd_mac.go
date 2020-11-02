@@ -10,6 +10,7 @@ func macMain(args []string) {
 	var vendorName string
 
 	devMessage("Entering macMain()")
+	sanitizeArguments()
 
 	db, dbErr := loadDatabase(config.DatabaseFile)
 	if dbErr != nil {
