@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 (Nothing at this time.)
 
+## [0.3.0] - 2020-11-08
+
+### Added
+
+1. Basic REST server.
+
 ## [0.2.0] - 2020-10-28
 
 ### Added
@@ -36,7 +42,8 @@ Initial public release.
 1. Querying the local OUI database.
 1. Basic documentation via [README].
 
-[Unreleased]: https://gitlab.com/rbrt-weiler/ouilookup/-/compare/0.2.0...master
+[Unreleased]: https://gitlab.com/rbrt-weiler/ouilookup/-/compare/0.3.0...master
+[0.3.0]: https://gitlab.com/rbrt-weiler/ouilookup/-/tree/0.3.0
 [0.2.0]: https://gitlab.com/rbrt-weiler/ouilookup/-/tree/0.2.0
 [0.1.0]: https://gitlab.com/rbrt-weiler/ouilookup/-/tree/v0.1.0
 [README]: README.md
