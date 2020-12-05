@@ -1,16 +1,16 @@
 {
-    "name": "Golang VS Code Remote Container",
-    "dockerFile": "Dockerfile",
-    "extensions": [
-        "helixquar.asciidecorator",
-        "aaron-bond.better-comments",
+	"name": "Golang VS Code Remote Container",
+	"dockerFile": "Dockerfile",
+	"extensions": [
+		"helixquar.asciidecorator",
+		"aaron-bond.better-comments",
 		"editorconfig.editorconfig",
-        "golang.go",
+		"golang.go",
 		"yzhang.markdown-all-in-one",
-        "vscode-icons-team.vscode-icons",
-        "davidanson.vscode-markdownlint"
-    ],
-    "settings": {
+		"vscode-icons-team.vscode-icons",
+		"davidanson.vscode-markdownlint"
+	],
+	"settings": {
 		"asciidecorator.defaultFont": "Banner3",
 		"editor.cursorBlinking": "phase",
 		"editor.detectIndentation": true,
@@ -35,5 +35,5 @@
 		"workbench.editor.highlightModifiedTabs": true,
 		"workbench.iconTheme": "vscode-icons"
 	},
-    "postCreateCommand": "/bin/bash ./.devcontainer/postCreate.sh"
+	"postCreateCommand": "/bin/bash ./.devcontainer/postCreate.sh"
 }
