@@ -1,5 +1,5 @@
-.devMode
-*.gz
-*.txt
-*.csv
-*.json
+/*.csv
+/*.gz
+/*.json
+/*.txt
+/.devMode
