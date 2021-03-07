@@ -106,5 +106,5 @@ release: $(PLATFORMS) ## Build a complete release
 
 all: pretty test release ## Run targets pretty, test and release
 
-clean: ## Remove build related file
+clean: ## Remove build related files
 	rm -rf $(sout_dir)
