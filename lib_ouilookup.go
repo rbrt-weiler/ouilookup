@@ -6,7 +6,6 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"sort"
@@ -153,7 +152,7 @@ func loadData(fileName string) (bytes.Buffer, error) {
 
 	devMessage("Entering loadData()")
 
-	content, contentErr := ioutil.ReadFile(fileName)
+	content, contentErr := os.ReadFile(fileName)
 	if contentErr != nil {
 		return retVal, fmt.Errorf("Could not read file: %s", contentErr)
 	}
