@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 1. Include Makefile.
 
+### Changed
+
+1. Upgrade from go1.15 to go1.17.
+
 ## [0.3.0] - 2020-11-08
 
 ### Added

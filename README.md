@@ -20,9 +20,9 @@ This tool uses Go modules to handle dependencies.
 
 Use `go run ./...` to run the tool directly or `go build -o ouilookup ./...` to compile a binary.
 
-Alternatively, Docker can be used to compile binaries by running `docker run --rm -v $PWD:/go/src -w /go/src golang:1.15 go build -o ouilookup ./...`. By passing the `GOOS` and `GOARCH` environment variables (via `-e`) this also enables cross compiling using Docker.
+Alternatively, Docker can be used to compile binaries by running `docker run --rm -v $PWD:/go/src -w /go/src golang:1.17 go build -o ouilookup ./...`. By passing the `GOOS` and `GOARCH` environment variables (via `-e`) this also enables cross compiling using Docker.
 
-Tested with [go1.15](https://golang.org/doc/go1.15).
+Tested with [go1.17](https://golang.org/doc/go1.17).
 
 ## Source
 

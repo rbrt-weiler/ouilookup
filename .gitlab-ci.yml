@@ -1,5 +1,5 @@
 default:
-  image: golang:1.16
+  image: golang:1.17
   before_script:
     - echo "CI for ${TOOL_NAME} commit ID ${CI_COMMIT_SHA}"
   after_script:
