@@ -1,74 +1,43 @@
-image: golang:1.16
+default:
+  image: golang:1.16
+  before_script:
+    - echo "CI for ${TOOL_NAME} commit ID ${CI_COMMIT_SHA}"
+  after_script:
+    - ls -lR .
 
-
+# do not forget to set project variables
+include:
+  - template: Jobs/Code-Quality.gitlab-ci.yml # GITLAB_FEATURES = "code_quality"
+  - template: Security/Dependency-Scanning.gitlab-ci.yml # GITLAB_FEATURES = "dependency_scanning"
+  - template: Security/License-Scanning.gitlab-ci.yml # GITLAB_FEATURES = "license_scanning"
+  - template: Security/SAST.gitlab-ci.yml # GITLAB_FEATURES = "sast"
 
 stages:
   - build
   - test
-  - deploy
+  - archive
 
 
 
-after_script:
-  - ls -lR .
-
-# do not forget to set project variables
-include:
-  - template: SAST.gitlab-ci.yml # GITLAB_FEATURES = "sast"
-  - template: Code-Quality.gitlab-ci.yml # GITLAB_FEATURES = "code_quality"
-  - template: Dependency-Scanning.gitlab-ci.yml # GITLAB_FEATURES = "dependency_scanning"
-  - template: License-Scanning.gitlab-ci.yml # GITLAB_FEATURES = "license_scanning"
-
-variables:
-  TOOL_NAME: "ouilookup"
-  SAST_DISABLE_DIND: "true"
-  SAST_GOSEC_LEVEL: 0
-
-
+.ci-vars:
+  variables:
+    TOOL_NAME: "ouilookup"
+    BINARIES_URL: "https://gitlab.com/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/jobs/${CI_JOB_ID}/artifacts/download?file_type=archive"
+    SAST_DISABLE_DIND: "true"
+    SAST_GOSEC_LEVEL: 0
 
 .build_command: &build_command
 - CGO=0 make build
 
-.build_command_release: &build_command_release
+.build_command_tagged: &build_command_tagged
 - CGO=0 VERSION="${CI_COMMIT_TAG}" make -j8 release
 
 .test_command: &test_command
 - CGO=0 make test
 
-.release_command: &release_command
-- ln -s out/${TOOL_NAME}_${CI_COMMIT_TAG} ${TOOL_NAME}_${CI_COMMIT_TAG}
-
-
-
-build-master:
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: always
-  cache:
-    key: "master-$CI_COMMIT_SHA"
-    paths:
-      - out
-  script:
-    - *build_command
-
-test-master:
-  stage: test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: on_success
-  cache:
-    key: "master-$CI_COMMIT_SHA"
-    paths:
-      - out
-  script:
-    - *test_command
-  artifacts:
-    when: on_success
-    expire_in: 30 minutes
-    name: "${TOOL_NAME}_${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - out/*
+.archive_command: &archive_command
+- mv out/${TOOL_NAME}_${CI_COMMIT_TAG} .
+- rm -rf out
 
 
 
@@ -77,56 +46,69 @@ build-tagged:
   rules:
     - if: '$CI_COMMIT_TAG'
       when: always
+  extends: .ci-vars
   cache:
-    key: "release-$CI_COMMIT_SHA"
+    key: "binaries-$CI_COMMIT_SHA"
     paths:
       - out
   script:
-    - *build_command_release
+    - *build_command_tagged
 
 test-tagged:
   stage: test
   rules:
     - if: '$CI_COMMIT_TAG'
       when: on_success
+  extends: .ci-vars
   cache:
-    key: "release-$CI_COMMIT_SHA"
+    key: "binaries-$CI_COMMIT_SHA"
     paths:
       - out
   script:
     - *test_command
 
-deploy-tagged:
-  stage: deploy
+archive-tagged:
+  stage: archive
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
     - if: '$CI_COMMIT_TAG'
       when: on_success
+  extends: .ci-vars
   cache:
-    key: "release-$CI_COMMIT_SHA"
+    key: "binaries-$CI_COMMIT_SHA"
     paths:
       - out
   script:
-    - *release_command
+    - *archive_command
   artifacts:
     when: on_success
     expire_in: never
     name: "${TOOL_NAME}_${CI_COMMIT_TAG}"
     paths:
       - ${TOOL_NAME}_${CI_COMMIT_TAG}/*
+  release:
+    tag_name: ${CI_COMMIT_TAG}
+    name: '${TOOL_NAME} v${CI_COMMIT_TAG}'
+    description: 'CHANGELOG.md'
+    ref: ${CI_COMMIT_SHA}
+    assets:
+      links:
+        - name: '${TOOL_NAME} ${CI_COMMIT_TAG} prebuilt binaries'
+          url: ${BINARIES_URL}
+          link_type: package
 
 
 
 build-any:
   stage: build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: never
     - if: '$CI_COMMIT_TAG'
       when: never
     - when: always
       allow_failure: true
+  extends: .ci-vars
   cache:
-    key: "dev-$CI_COMMIT_SHA"
+    key: "binaries-$CI_COMMIT_SHA"
     paths:
       - out
   script:
@@ -135,15 +117,20 @@ build-any:
 test-any:
   stage: test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: never
     - if: '$CI_COMMIT_TAG'
       when: never
     - when: always
       allow_failure: true
+  extends: .ci-vars
   cache:
-    key: "dev-$CI_COMMIT_SHA"
+    key: "binaries-$CI_COMMIT_SHA"
     paths:
       - out
   script:
     - *test_command
+  artifacts:
+    when: on_success
+    expire_in: 30 minutes
+    name: "${TOOL_NAME}_${CI_COMMIT_SHORT_SHA}_dev"
+    paths:
+      - out/*
